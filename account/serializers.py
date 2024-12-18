@@ -1,7 +1,7 @@
 import re
 from rest_framework import serializers
 
-class CustomUserSerializer(serializers.Serializer):
+class UserPhoneSerializer(serializers.Serializer):
     phone = serializers.CharField()
 
     def validate_phone(self, value):
