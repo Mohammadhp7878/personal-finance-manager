@@ -5,10 +5,12 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.exceptions import ValidationError
 from .serializers import UserPhoneSerializer
-from utils import generate_otp
+from .models import CustomUser
+from utils import generate_otp, verify_otp
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +60,33 @@ class SendOtp(APIView):
         )
 
 
+class VerifyOtp(APIView):
+    throttle_classes = [ScopedRateThrottle, AnonRateThrottle]
+    throttle_scope = "login"
+    
+    def post(self, request):
+        phone = request.session.get("phone")
+        enterd_otp = request.data.get("otp")
+
+        if not enterd_otp or not phone:
+            return Response(
+                {"error": "phone and otp code are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            verify_otp(phone, enterd_otp)
+            user, created = CustomUser.objects.get_or_create(phone=phone)
+
+            request.session.flush()
+
+            refresh = RefreshToken.for_user(user)
+            logger.info(f"user with {phone} phone number logged in successfully")
+
+            return Response(
+                {"refresh": str(refresh), "access": str(refresh.access_token)},
+                status=status.HTTP_200_OK,
+            )
+        except ValidationError as e:
+            logger.warning(f"failed to send OTP because of {e}")
+            return Response({"error": e.args}, status=status.HTTP_400_BAD_REQUEST)
