@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'finance.apps.FinanceConfig',
     'core.apps.CoreConfig',
+    
 
     'rest_framework',
     'rest_framework.authtoken',
