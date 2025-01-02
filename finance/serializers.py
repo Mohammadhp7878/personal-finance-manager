@@ -8,7 +8,7 @@ class CryptoAssetSerializer(serializers.ModelSerializer):
         model = CryptoAsset
         fields = ["name", "balance", "symbol", "price_at_purchase"]
         extra_kwargs = {
-            "price_at_purchase": {"read_only": True}
+            "price_at_purchase": {"read_only": True},
         }
 
 
