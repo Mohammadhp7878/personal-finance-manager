@@ -15,4 +15,11 @@ class CryptoAssetView(generics.ListCreateAPIView):
             return super().create(request, *args, **kwargs)
         except IntegrityError:
             return Response("this coin already exists", status=status.HTTP_400_BAD_REQUEST)
+
+
+class SingleCryptoView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CryptoAssetSerializer
+    lookup_field = "name"
     
+    def get_queryset(self):
+        return CryptoAsset.objects.filter(name=self.kwargs["name"])
