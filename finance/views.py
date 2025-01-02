@@ -5,7 +5,8 @@ from django.db import IntegrityError
 from rest_framework.response import Response
 from rest_framework import status
 
-class AddCryptoAsset(generics.CreateAPIView):
+
+class CryptoAssetView(generics.ListCreateAPIView):
     serializer_class = CryptoAssetSerializer
     queryset = CryptoAsset.objects.all()
 

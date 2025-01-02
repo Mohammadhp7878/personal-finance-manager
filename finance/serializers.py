@@ -6,7 +6,10 @@ from rest_framework.validators import ValidationError
 class CryptoAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = CryptoAsset
-        fields = ["name", "balance"]
+        fields = ["name", "balance", "symbol", "price_at_purchase"]
+        extra_kwargs = {
+            "price_at_purchase": {"read_only": True}
+        }
 
 
     def create(self, validated_data):
