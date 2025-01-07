@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
 from .managers import CustomUserManager
+from core.models import BaseModel
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -18,3 +19,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     USERNAME_FIELD = "phone"
     REQUIRED_FIELDS = []
+    
+    
+class UserProfile(BaseModel):
+    name = models.CharField(max_length=30)
+    family = models.CharField(max_length=50)
+    email = models.EmailField()
+    
+    def __str__(self):
+        return f"{self.name}  {self.family}"
+    
