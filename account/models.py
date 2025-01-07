@@ -30,7 +30,7 @@ class UserProfile(BaseModel):
     email = models.EmailField()
 
     def __str__(self):
-        return f"{self.name}  {self.family}"
+        return f"{self.first_name}  {self.last_name}"
 
 
 @receiver(post_save, sender=CustomUser)
