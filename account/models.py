@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import RegexValidator
 from .managers import CustomUserManager
@@ -19,13 +21,24 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     USERNAME_FIELD = "phone"
     REQUIRED_FIELDS = []
-    
-    
+
+
 class UserProfile(BaseModel):
-    name = models.CharField(max_length=30)
-    family = models.CharField(max_length=50)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=50)
     email = models.EmailField()
-    
+
     def __str__(self):
         return f"{self.name}  {self.family}"
-    
+
+
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=CustomUser)
+def save_user_profile(sender, instance, **kwargs):
+    instance.userprofile.save()
