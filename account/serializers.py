@@ -10,7 +10,11 @@ class UserPhoneSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid phone number format.")
         
         return value
-    
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["phone", "id"]    
     
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
