@@ -1,5 +1,6 @@
 import re
 from rest_framework import serializers
+from .models import CustomUser, UserProfile
 
 class UserPhoneSerializer(serializers.Serializer):
     phone = serializers.CharField()
@@ -9,4 +10,10 @@ class UserPhoneSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid phone number format.")
         
         return value
+    
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ["first_name", "last_name", "email", ]
         
