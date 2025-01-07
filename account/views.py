@@ -8,8 +8,13 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.exceptions import ValidationError
-from .serializers import UserPhoneSerializer
-from .models import CustomUser
+from .serializers import (
+    UserPhoneSerializer,
+    UserProfileSerializer,
+    CustomUserSerializer,
+)
+from .models import CustomUser, UserProfile
+from rest_framework import generics
 from utils import generate_otp, verify_otp
 
 logger = logging.getLogger(__name__)
@@ -30,8 +35,7 @@ class SendOtp(APIView):
             return Response(
                 {"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST
             )
-        
-        
+
         otp = generate_otp(phone)
         headers = {
             "apiKey": settings.MSG_API_KEY,
@@ -63,7 +67,7 @@ class SendOtp(APIView):
 class VerifyOtp(APIView):
     throttle_classes = [ScopedRateThrottle, AnonRateThrottle]
     throttle_scope = "login"
-    
+
     def post(self, request):
         phone = request.session.get("phone")
         enterd_otp = request.data.get("otp")
@@ -90,3 +94,13 @@ class VerifyOtp(APIView):
         except ValidationError as e:
             logger.warning(f"failed to send OTP because of {e}")
             return Response({"error": e.args}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserListView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
