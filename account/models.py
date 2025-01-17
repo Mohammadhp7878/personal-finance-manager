@@ -21,6 +21,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     USERNAME_FIELD = "phone"
     REQUIRED_FIELDS = []
+    
+    def __str__(self):
+        return self.phone
+    
 
 
 class UserProfile(BaseModel):
@@ -30,8 +34,14 @@ class UserProfile(BaseModel):
     email = models.EmailField()
 
     def __str__(self):
-        return f"{self.first_name}  {self.last_name}"
-
+        if self.first_name or self.last_name:
+            return f"{self.first_name}  {self.last_name}"
+        else: 
+            return self.user.phone
+        
+    class Meta:
+        ordering = ["last_name"]
+        
 
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
