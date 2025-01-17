@@ -14,6 +14,7 @@ from .serializers import (
     CustomUserSerializer,
 )
 from .models import CustomUser, UserProfile
+from .permissions import IsOwner
 from rest_framework import generics
 from utils import generate_otp, verify_otp
 
@@ -104,3 +105,7 @@ class UserListView(generics.ListAPIView):
 class UserProfileView(generics.RetrieveUpdateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    permission_classes = [IsOwner]
+
+    def get_object(self):
+        return self.request.user.profile
