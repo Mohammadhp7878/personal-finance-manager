@@ -1,25 +1,33 @@
-from rest_framework import generics
+from rest_framework.views import APIView
 from .serializers import CryptoAssetSerializer
 from .models import CryptoAsset
 from django.db import IntegrityError
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
-
-class CryptoAssetView(generics.ListCreateAPIView):
-    serializer_class = CryptoAssetSerializer
-    queryset = CryptoAsset.objects.all()
-
-    def create(self, request, *args, **kwargs):
+class CryptoAssetView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = CryptoAssetSerializer(data=request.data, context={"user": request.user})
+        
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def get(self, request):
+        crypto_data = CryptoAsset.objects.filter(user=request.user)
+        serialized_data = CryptoAssetSerializer(crypto_data, many=True)  
         try:
-            return super().create(request, *args, **kwargs)
-        except IntegrityError:
-            return Response("this coin already exists", status=status.HTTP_400_BAD_REQUEST)
+            return Response(serialized_data.data)
+        except ValidationError as e:
+            return Response({'errors': str(e)})
+        
 
 
-class SingleCryptoView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CryptoAssetSerializer
-    lookup_field = "name"
-    
-    def get_queryset(self):
-        return CryptoAsset.objects.filter(name=self.kwargs["name"])
+class SingleCryptoView(APIView):
+    ...
