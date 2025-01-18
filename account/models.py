@@ -28,7 +28,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class UserProfile(BaseModel):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="user_profile")
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
@@ -51,4 +51,4 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
-    instance.userprofile.save()
+    instance.user_profile.save()
