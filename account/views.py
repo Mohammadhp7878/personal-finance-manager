@@ -19,8 +19,19 @@ from rest_framework import generics
 from utils import generate_otp, verify_otp
 
 logger = logging.getLogger(__name__)
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
 
 
+@extend_schema(
+    summary="Send OTP to a phone number",
+    description="Send a one-time password (OTP) to the provided phone number.",
+    request=UserPhoneSerializer,
+    responses={
+        200: OpenApiTypes.OBJECT,  
+        400: OpenApiTypes.OBJECT, 
+    },
+)
 class SendOtp(APIView):
     throttle_classes = [ScopedRateThrottle, AnonRateThrottle]
     throttle_scope = "login"
@@ -65,6 +76,25 @@ class SendOtp(APIView):
         )
 
 
+
+
+@extend_schema(
+    summary="Verify OTP and authenticate the user",
+    description="Verify the OTP code sent to the user and return access and refresh tokens upon successful verification.",
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "otp": {"type": "string", "example": "123456"},
+            },
+            "required": ["otp"],
+        }
+    },
+    responses={
+        200: OpenApiTypes.OBJECT,  
+        400: OpenApiTypes.OBJECT,  
+    },
+)
 class VerifyOtp(APIView):
     throttle_classes = [ScopedRateThrottle, AnonRateThrottle]
     throttle_scope = "login"
@@ -108,4 +138,4 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsOwner]
 
     def get_object(self):
-        return self.request.user.profile
+        return self.request.user.user_profile
