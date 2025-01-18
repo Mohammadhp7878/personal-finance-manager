@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from decouple import config
 from pathlib import Path
+from datetime import timedelta
 import os
 
 
@@ -170,7 +171,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "10/minute",
         "user": "800/day",
-        "login": "10/hour",
+        "login": "14/hour",
     },
 }
 
@@ -207,4 +208,13 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'a place to control all your assets',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=150),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    
+    'ROTATE_REFRESH_TOKENS': True,                
+    'BLACKLIST_AFTER_ROTATION': True,              
+    'AUTH_HEADER_TYPES': ('Bearer',),            
 }
