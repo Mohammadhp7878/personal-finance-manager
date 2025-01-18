@@ -4,7 +4,7 @@ from account.models import CustomUser
 
 class CryptoAsset(BaseModel):
     user = models.ForeignKey(CustomUser, related_name="crypto_assets", on_delete=models.CASCADE)
-    id = models.IntegerField(primary_key=True, unique=True, blank=True)
+    coin_id = models.IntegerField(blank=True)
     name = models.CharField(max_length=30)
     symbol = models.CharField(max_length=10, null=True, blank=True)
     balance = models.DecimalField(decimal_places=2, max_digits=12)
